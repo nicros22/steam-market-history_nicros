@@ -9,6 +9,7 @@ import steam.webauth as wa
 import typer
 
 app = typer.Typer()
+kzt_rate = 4.89
 
 
 def login_cli() -> wa.WebAuth:
@@ -78,8 +79,13 @@ def fetch_market_history(steam_session: wa.WebAuth) -> list:
         image_url = item_img_element.get("src") if item_img_element else None
 
         # Format price of market listing item
-        if re.search(r"^\d+,(\d|-){2}$", price):
-            price = price.replace(",--", ".00").replace(",", ".")
+        if re.search(r"\d+,(\d|-){2}.", price):
+            price = price.replace(",--", ".00").replace(",", ".").replace(" ", "")
+            print("price ||" + price)
+            if "₸" in price:
+                price = price.replace("₸", "")
+                price = float(price) / kzt_rate
+                price = f"{price:.2f}pуб."
 
         # Format original steam data (market_listing_row) and add it to an array
         if gain_or_loss in ["+", "-"]:
